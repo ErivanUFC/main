@@ -1,6 +1,6 @@
 class Player {
-    constructor( x, y, accx, accy, R, G, B, radius ){
-        this.radius = radius || 10;
+    constructor( x, y, accx, accy, R, G, B, radius, stop, sprite ){
+		this.radius = radius || 10;
         this.traj = [];
         this.count = 0;
         this.R = R || 0;
@@ -10,35 +10,70 @@ class Player {
         this.vel = createVector(0, 0);
         this.acc = createVector(accx, accy);
         this.mass = 10;
-        this.Gravity = 1;
+		this.Gravity = 1;
+		this.stop = stop;
+		this.spr = sprite || loadImage('./assets/rocket.png');
+		this.spr_cont = 1;
+		this.spr_current = 1;
+		this.ang = 0;
+		this.frame = 0;
+		this.frameRate = 60; 
     }
 
 	draw() {
+		if( this.spr_current < this.spr_cont  )
+			this.spr_current += 1;
+		else 
+			this.spr_current = 1;
+
+		if( this.spr_current == 12 ) 
+			this.draw = function(){};
+
+			/* Draw trajectory */
+		if (255 == this.traj.length ) {
+			for (var i = 0; i < this.traj.length - 1; i++) 
+				this.traj[i] = this.traj[i+1];
+			this.traj[ this.traj.length-1] = createVector(this.pos.x,this.pos.y);
+		} else 
+			this.traj.push( createVector(this.pos.x,this.pos.y) );
+
+		if( this == rocket ){
+			strokeWeight(4);
+			beginShape(LINES);
+			stroke(200);
+			for (var i=0; i < this.traj.length - 1; i++) {
+				//stroke(this.R,this.G,this.B,i);
+				vertex(this.traj[i].x, this.traj[i].y);
+				vertex(this.traj[i+1].x, this.traj[i+1].y);
+			}
+			endShape();
+			noStroke();
+		}
+
 		/* Draw planet */
 		push();
-		noStroke();
-		fill(this.R,this.G,this.B,250);
-		translate(this.pos.x, this.pos.y);
-		rotate(this.vel.heading());
-		ellipse(0, 0, this.radius*2, this.radius*2); 
-		pop();
-
-		/* Draw trajectory */
-		if (255 == this.count ) {
-			for (var i = 0; i < this.count-1; i++) {
-				this.traj[i] = this.traj[i+1];
-			}
-			this.traj[this.count-1] = createVector(this.pos.x,this.pos.y);
-		} else {
-			this.traj[this.count] = createVector(this.pos.x,this.pos.y);
-			this.count++;
-		}
-		for (var i =0; i < this.traj.length; i++) {
-			fill(this.R,this.G,this.B,i);
 			noStroke();
-			ellipse(this.traj[i].x, this.traj[i].y, 2, 2);
-			//ellipse(this.traj[i].x, this.traj[i].y, 2, 2);
-		}
+			fill(this.R,this.G,this.B,250);
+			translate(this.pos.x, this.pos.y);
+			
+			//console.log(this.vel);
+			if( ( this.vel.x != 0 || this.vel.y != 0 ) && !this.stop )
+				this.ang = this.vel.heading() - 3.14/2;
+			//if( this.vel.x == 0 || this.vel.y == 0 )
+				//this.ang = 3.14;
+			rotate(this.ang);
+			//ellipse(0, 0, this.radius*2, this.radius*2) 
+		
+			image( this.spr, 
+				-this.spr.width/this.spr_cont/2, 
+				-this.spr.height/2, 
+				this.spr.width/this.spr_cont, 
+				this.spr.height, 
+				this.spr.width/this.spr_cont * this.spr_current - this.spr.width/this.spr_cont, 
+				0, 
+				this.spr.width/this.spr_cont, 
+				this.spr.height );
+		pop();
 	}
 
     applyForce(force) {
