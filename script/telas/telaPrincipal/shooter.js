@@ -1,5 +1,5 @@
 class Shooter {
-    constructor(){
+    constructor( rocket ){
         this.x1 = 0;
         this.y1 = 0;
         this.x2 = 0;
@@ -11,15 +11,16 @@ class Shooter {
         this.force_axes = createVector();
         this.shooting=false;
         this.c_shooting=false;
-        this.touchKey=false;
+		this.touchKey=false;
+		this.rocket = rocket;
     }
 
     update() {
 		/* Mouse shooter */
 		if((!this.shooting) && (mouseIsPressed) && (!this.c_shooting)) {
 			this.shooting = true;
-			this.x1 = rocket.pos.x;
-			this.y1 = rocket.pos.y;
+			this.x1 = this.rocket.pos.x;
+			this.y1 = this.rocket.pos.y;
 			this.R = floor(random(255));
 			this.G = floor(random(255));
 			this.B = floor(random(255));
@@ -29,9 +30,9 @@ class Shooter {
 			this.x2 = mouseX;
 			this.y2 = mouseY;	
 			
-			rocket.pos.x = this.x2;
-			rocket.pos.y = this.y2;
-			rocket.ang = atan2(this.y1-this.y2,this.x1-this.x2) - 3.14/2;
+			this.rocket.pos.x = this.x2;
+			this.rocket.pos.y = this.y2;
+			this.rocket.ang = atan2(this.y1-this.y2,this.x1-this.x2) - 3.14/2;
 
 			this.force = int(dist(this.x1, this.y1, this.x2, this.y2))/10;
 		}
@@ -57,7 +58,9 @@ class Shooter {
 					if(this.y2 < this.y1) 	direction = createVector(-1, 1);
 					else 				  	direction = createVector(-1,-1);
 				}
-				rocket = new Player(this.x2, this.y2, (direction.x * this.force_axes.x),(direction.y * this.force_axes.y), this.R, this.G, this.B, 20, false);
+				console.log("forca");
+				this.rocket = new Player(this.x2, this.y2, (direction.x * this.force_axes.x),(direction.y * this.force_axes.y), this.R, this.G, this.B, 20, false);
+				infografico.rocket = this.rocket;
 			}
 			this.shooting = false;
 		}

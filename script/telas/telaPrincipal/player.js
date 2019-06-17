@@ -1,5 +1,5 @@
 class Player {
-    constructor( x, y, accx, accy, R, G, B, radius, stop, sprite ){
+  constructor( x, y, accx, accy, R, G, B, radius, stop, sprite ){
 		this.radius = radius || 10;
         this.traj = [];
         this.count = 0;
@@ -18,7 +18,9 @@ class Player {
 		this.ang = 0;
 		this.frame = 0;
 		this.frameRate = 60; 
-    }
+		this.dist = 0;
+		this.orbitAng = 0;
+  }
 
 	draw() {
 		if( this.spr_current < this.spr_cont  )
@@ -36,19 +38,6 @@ class Player {
 			this.traj[ this.traj.length-1] = createVector(this.pos.x,this.pos.y);
 		} else 
 			this.traj.push( createVector(this.pos.x,this.pos.y) );
-
-		if( this == rocket ){
-			strokeWeight(4);
-			beginShape(LINES);
-			stroke(200);
-			for (var i=0; i < this.traj.length - 1; i++) {
-				//stroke(this.R,this.G,this.B,i);
-				vertex(this.traj[i].x, this.traj[i].y);
-				vertex(this.traj[i+1].x, this.traj[i+1].y);
-			}
-			endShape();
-			noStroke();
-		}
 
 		/* Draw planet */
 		push();
@@ -76,7 +65,20 @@ class Player {
 		pop();
 	}
 
-    applyForce(force) {
+	drawTraj() {
+			strokeWeight(4);
+			beginShape(LINES);
+			stroke(200);
+			for (var i=0; i < this.traj.length - 1; i++) {
+				//stroke(this.R,this.G,this.B,i);
+				vertex(this.traj[i].x, this.traj[i].y);
+				vertex(this.traj[i+1].x, this.traj[i+1].y);
+			}
+			endShape();
+			noStroke();
+	}
+
+  applyForce(force) {
 		this.acc.add(force);
 	}
 
@@ -86,7 +88,7 @@ class Player {
 		this.acc.mult(0);
 	}
 
-    orbit(body) {
+  orbit(body) {
 		var gravity_force = 0; 
 		var gravity_force_x = 0; 
 		var gravity_force_y = 0; 
